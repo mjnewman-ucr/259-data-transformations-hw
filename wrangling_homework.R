@@ -2,6 +2,7 @@
 #For full credit, provide answers for at least 7/10
 
 #List names of students collaborating with: 
+#Just me :)
 
 ### SETUP: RUN THIS BEFORE STARTING ----------
 
@@ -16,7 +17,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 #Use typeof to check that your conversion succeeded
 
 #ANSWER
-
+glimpse(ds)
+ds$Year <- as.numeric(ds$Year)
+typeof(ds$Year)
 
 ### Question 2 ---------- 
 
@@ -24,6 +27,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # change ds so that all of the variables are lowercase
 
 #ANSWER
+ds <- ds %>% rename_with(tolower)
 
 ### Question 3 ----------
 
@@ -32,12 +36,20 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Hint: read the documentation for ?floor
 
 #ANSWER
+####Tried it a bunch of different ways and this was the only way I could get it to work
+?floor
+ds <- ds %>% mutate(decade_calc = year/10, 
+              decade_calc2 = floor(decade_calc),
+              decade = decade_calc2*10)
+              
+
 
 ### Question 4 ----------
 
 # Sort the dataset by rank so that 1 is at the top
 
 #ANSWER
+arrange(ds, rank)
 
 ### Question 5 ----------
 
@@ -45,7 +57,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # That just has the artists and songs for the top 10 songs
 
 #ANSWER
-
+top10 <- ds %>% arrange(rank) %>% filter(rank < 11) %>% select(artist, song)
 
 ### Question 6 ----------
 
@@ -53,6 +65,10 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # of all songs on the full list. Save it to a new tibble called "ds_sum"
 
 #ANSWER
+ds_sum <- ds %>% summarize(earliest_song = min(year, na.rm = T),
+                 most_recent_song = max(year, na.rm = T),
+                 average_release_year = mean(year, na.rm = T))
+                 
 
 
 ### Question 7 ----------
@@ -62,7 +78,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Use one filter command only, and sort the responses by year
 
 #ANSWER
-
+ds %>% filter(year %in% c(1879, 2020, 1980)) %>% arrange(year)
 
 ### Question 8 ---------- 
 
@@ -74,6 +90,14 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 
 #ANSWER
 
+ds <- ds %>% mutate(year = ifelse(song == "Brass in Pocket", 1979, year)) 
+
+ds_sum <- ds %>% summarize(earliest_song = min(year, na.rm = T),
+                           most_recent_song = max(year, na.rm = T),
+                           average_release_year = mean(year, na.rm = T))
+
+ds %>% filter(year %in% c(1937, 2020, 1980)) %>% arrange(year)
+
 
 ### Question 9 ---------
 
@@ -84,7 +108,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Use the pipe %>% to string the commands together
 
 #ANSWER
-
+ds %>% filter(!is.na(year)) %>% group_by(decade) %>% summarize(average_rank = mean(rank),
+                                      count = n())
+#question: why do some of the average_rank numbers in my output have periods at the end?
 
 ### Question 10 --------
 
@@ -94,5 +120,5 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Use the pipe %>% to string the commands together
 
 #ANSWER
-
+ds %>% filter(!is.na(year)) %>% count(decade) %>% slice_max(n)
   
