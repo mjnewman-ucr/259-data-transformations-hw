@@ -41,6 +41,9 @@ ds <- ds %>% rename_with(tolower)
 ds <- ds %>% mutate(decade_calc = year/10, 
               decade_calc2 = floor(decade_calc),
               decade = decade_calc2*10)
+
+#explained during class:
+ds <- ds %>% mutate(decade = floor(year/10)*10)
               
 
 
@@ -79,6 +82,8 @@ ds_sum <- ds %>% summarize(earliest_song = min(year, na.rm = T),
 
 #ANSWER
 ds %>% filter(year %in% c(1879, 2020, 1980)) %>% arrange(year)
+#in class: the way I did it was hardcoding because it is not flexible if the data changes
+#I should actually use min(year, na.rm = T) etc.
 
 ### Question 8 ---------- 
 
@@ -91,6 +96,10 @@ ds %>% filter(year %in% c(1879, 2020, 1980)) %>% arrange(year)
 #ANSWER
 
 ds <- ds %>% mutate(year = ifelse(song == "Brass in Pocket", 1979, year)) 
+
+ds <- ds %>% mutate(decade_calc = year/10, 
+                    decade_calc2 = floor(decade_calc),
+                    decade = decade_calc2*10)
 
 ds_sum <- ds %>% summarize(earliest_song = min(year, na.rm = T),
                            most_recent_song = max(year, na.rm = T),
@@ -106,6 +115,7 @@ ds %>% filter(year %in% c(1937, 2020, 1980)) %>% arrange(year)
 # filter out the NA values from decade before summarizing
 # You don't need to save the results anywhere
 # Use the pipe %>% to string the commands together
+
 
 #ANSWER
 ds %>% filter(!is.na(year)) %>% group_by(decade) %>% summarize(average_rank = mean(rank),
